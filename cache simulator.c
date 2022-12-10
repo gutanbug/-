@@ -9,7 +9,7 @@ typedef struct blk{
 }blk;
 block_ptr bp;
 
-int total, miss;
+int cycle, miss;
 int lru_time;
 
 int vict(int set, int b_count){
@@ -61,8 +61,8 @@ void read_data(int addr, int cache, int block, int b_count){
 	}
 }
 
-void simul(int cache, int block, int b_count){
-	total=0;
+void check(int cache, int block, int b_count){
+	cycle=0;
 	miss=0;
     int empty, addr;
 	int num = cache / block;
@@ -77,11 +77,11 @@ void simul(int cache, int block, int b_count){
         fscanf(fp, "%c %x %d\n", &mode, &addr, &empty);
 		if(mode == 'l'){
 			read_data(addr, cache, block, b_count);
-			total++;
+			cycle++;
 		}
 		lru_time++;
     }
-	miss_rate = (double)miss/(double)total;
+	miss_rate = (double)miss/(double)cycle;
 	
 	printf("\ncache size : %d\n", cache);
 	printf("block size : %d\n", block);
@@ -110,7 +110,7 @@ int main(){
 			printf("\nInput Success !\n\n");
 		}
 		else if(input == 2)
-			simul(cache, block, b_count);
+			check(cache, block, b_count);
 		else
 			exit(0);
 	}
