@@ -12,27 +12,25 @@ block_ptr bp;
 int cycle, miss;
 int lru_time;
 
-int vict(int set, int b_count){
-	int i, t = 0;
+int find_index(int set, int b_count){
+	int i=0, t = 0;
 	int min = lru_time+1, index = 0;
 	
-	for(i=0;i<b_count;i++){
+	while(i != b_count){
 		t = bp[set*b_count+i].period;
-		if(min > t){
-			min = t;
-			index = i;
+		if(t < min){
+			min = t; index = i;
 		}
+		i++;
 	}
 	return index;
 }
 
 void read_data(int addr, int cache, int block, int b_count){
-	int set_count, set, i;
-	int size = 10, victim;
 	block_ptr temp;
-	
-	set_count = cache / (block*b_count);
-	set = (addr/block) % set_count;
+	int set_count = cache / (block*b_count);
+	int set = (addr/block) % set_count;
+	int size = 10, victim, i;
 	
 	for(i=0;i<b_count;i++){
 		temp = &bp[set*b_count + i];
@@ -46,7 +44,7 @@ void read_data(int addr, int cache, int block, int b_count){
 	}
 	miss++;
 	if(size == 10){
-		victim = vict(set, b_count);
+		victim = find_index(set, b_count);
 		temp = &bp[set*b_count + victim];
 		
 		temp->valid = 1;
@@ -62,13 +60,12 @@ void read_data(int addr, int cache, int block, int b_count){
 }
 
 void check(int cache, int block, int b_count){
-	cycle=0;
-	miss=0;
+	FILE *fp = NULL;
+	cycle=0; miss=0;
     int empty, addr;
 	int num = cache / block;
 	double miss_rate = 0;
     char mode;
-    FILE *fp = NULL;
 	
 	bp = (block_ptr)calloc(num, sizeof(blk));
 
